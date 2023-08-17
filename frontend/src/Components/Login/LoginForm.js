@@ -11,7 +11,10 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/login', { email, password });
+      const response = await axios.post('http://localhost:5000/api/login',  {
+        email: email,
+        password: password,
+      });
       console.log('Login successful:', response.data);
       localStorage.setItem('jwtToken', response.data.token);
       setLoginSuccess(true);
@@ -41,8 +44,8 @@ function LoginForm() {
         />
         <button type="submit">Login</button>
       </form>
-      {loginSuccess && <p>Login successful!</p>}
-      {loginError && <p>{loginError}</p>}
+      {loginSuccess && <p className="success-message">Login successful!</p>}
+      {loginError && <p className="error-message">{loginError}</p>}
     </div>
   );
 }

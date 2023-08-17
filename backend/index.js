@@ -52,6 +52,33 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// Login Route
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    
+    // Compare the provided password with the stored hashed password
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      throw new Error('Invalid credentials');
+    }
+    
+    // Generate a JWT token
+    const token = jwt.sign({ userId: user._id }, 'your_secret_key_here');
+    
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(401).json({ message: 'Login failed' });
+  }
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
