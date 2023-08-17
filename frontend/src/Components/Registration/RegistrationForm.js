@@ -11,7 +11,10 @@ function RegistrationForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/register', { email, password });
+      const response = await axios.post('http://localhost:5000/api/register', {
+        email: email,
+        password: password,
+      });
       console.log('Registration successful:', response.data);
       setRegistrationSuccess(true);
       setRegistrationError(null);
