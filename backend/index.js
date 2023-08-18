@@ -6,6 +6,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 5000;
+const crypto = require('crypto');
+
+// Generate a random secret key
+const secretKey = crypto.randomBytes(32).toString('hex');
 
 // Connect to MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/TaskManager', {
@@ -70,7 +74,7 @@ app.post('/api/login', async (req, res) => {
     }
     
     // Generate a JWT token
-    const token = jwt.sign({ userId: user._id }, 'your_secret_key_here');
+    const token = jwt.sign({ userId: user._id }, secretKey);
     
     res.status(200).json({ token });
   } catch (error) {
