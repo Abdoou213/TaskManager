@@ -83,6 +83,68 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Task Schema
+const taskSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  // You can add more fields here based on your task requirements
+});
+
+const Task = mongoose.model('Task', taskSchema);
+
+// Create Task Route
+app.post('/api/tasks', async (req, res) => {
+  try {
+    const { title, description } = req.body;
+
+    // Create a new task in the database
+    const newTask = new Task({ title, description });
+    await newTask.save();
+
+    res.status(201).json({ message: 'Task created successfully' });
+  } catch (error) {
+    console.error('Task creation error:', error);
+    res.status(500).json({ message: 'Task creation failed' });
+  }
+});
+
+// Fetch All Tasks Route
+app.get('/api/tasks', async (req, res) => {
+  try {
+    // Fetch all tasks from the database
+    const tasks = await Task.find();
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error('Fetching tasks error:', error);
+    res.status(500).json({ message: 'Error fetching tasks' });
+  }
+});
+
+// Update Task Route
+app.put('/api/tasks/:taskId', async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    const { taskId } = req.params;
+
+    // Find the task by ID and update its fields
+    const updatedTask = await Task.findByIdAndUpdate(
+      taskId,
+      { title, description },
+      { new: true } // Return the updated task
+    );
+
+    if (!updatedTask) {
+      throw new Error('Task not found');
+    }
+
+    res.status(200).json({ message: 'Task updated successfully' });
+  } catch (error) {
+    console.error('Task update error:', error);
+    res.status(500).json({ message: 'Task update failed' });
+  }
+});
+
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

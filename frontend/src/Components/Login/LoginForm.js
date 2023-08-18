@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState} from 'react';
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import './LoginForm.css';
 
 function LoginForm() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(null);
@@ -11,18 +14,17 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/login',  {
+      const response = await axios.post('http://localhost:5000/api/login', {
         email: email,
         password: password,
       });
       console.log('Login successful:', response.data);
-      localStorage.setItem('jwtToken', response.data.token);
-      setLoginSuccess(true);
       setLoginError(null);
+      setLoginSuccess(true); 
+      navigate('/tasks'); 
     } catch (error) {
       console.error('Login error:', error);
       setLoginError('Login failed. Please check your credentials.');
-      setLoginSuccess(false);
     }
   };
 
@@ -46,6 +48,8 @@ function LoginForm() {
       </form>
       {loginSuccess && <p className="success-message">Login successful!</p>}
       {loginError && <p className="error-message">{loginError}</p>}
+      
+      <p>Don't have an account? <Link to="/register">Register here</Link></p>
     </div>
   );
 }

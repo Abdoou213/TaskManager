@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom'; 
 import './RegistrationForm.css';
 
 function RegistrationForm() {
@@ -45,6 +46,8 @@ function RegistrationForm() {
       </form>
       {registrationSuccess && <p className="success-message">Registration successful!</p>}
       {registrationError && <p className="error-message">{registrationError}</p>}
+      
+      <p>Already have an account? <Link to="/login">Login here</Link></p>
     </div>
   );
 }
