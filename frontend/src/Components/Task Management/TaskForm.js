@@ -8,9 +8,14 @@ function TaskForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token'); // Get the token from local storage
       const response = await axios.post('http://localhost:5000/api/tasks', {
         title: title,
         description: description,
+      }, {
+        headers: {
+          Authorization: token, // Include the token in the headers
+        },
       });
       console.log('Task created:', response.data);
       // Handle any success notifications or redirects here
@@ -19,6 +24,9 @@ function TaskForm() {
       // Handle error notifications here
     }
   };
+
+
+
 
   return (
     <div className="task-form">

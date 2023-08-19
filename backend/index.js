@@ -76,29 +76,43 @@ app.post('/api/login', async (req, res) => {
     // Generate a JWT token
     const token = jwt.sign({ userId: user._id }, secretKey);
     
-    res.status(200).json({ token });
+    res.status(200).json({ token, userId: user._id });
   } catch (error) {
     console.error('Login error:', error);
     res.status(401).json({ message: 'Login failed' });
   }
 });
 
-// Task Schema
 const taskSchema = new mongoose.Schema({
   title: String,
   description: String,
-  // You can add more fields here based on your task requirements
+  creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 
 const Task = mongoose.model('Task', taskSchema);
 
-// Create Task Route
-app.post('/api/tasks', async (req, res) => {
+function authenticateUser(req, res, next) {
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).json({ message: 'No token, authorization denied' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    req.userId = decoded.userId;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Token is not valid' });
+  }
+}
+
+app.post('/api/tasks', authenticateUser, async (req, res) => {
   try {
     const { title, description } = req.body;
 
-    // Create a new task in the database
-    const newTask = new Task({ title, description });
+    // Create a new task in the database and associate it with the logged-in user
+    const newTask = new Task({ title, description, creator: req.userId });
     await newTask.save();
 
     res.status(201).json({ message: 'Task created successfully' });
@@ -108,17 +122,18 @@ app.post('/api/tasks', async (req, res) => {
   }
 });
 
-// Fetch All Tasks Route
-app.get('/api/tasks', async (req, res) => {
+
+app.get('/api/tasks', authenticateUser, async (req, res) => {
   try {
-    // Fetch all tasks from the database
-    const tasks = await Task.find();
+    // Fetch tasks associated with the logged-in user
+    const tasks = await Task.find({ creator: req.userId });
     res.status(200).json(tasks);
   } catch (error) {
     console.error('Fetching tasks error:', error);
     res.status(500).json({ message: 'Error fetching tasks' });
   }
 });
+
 
 // Update Task Route
 app.put('/api/tasks/:taskId', async (req, res) => {

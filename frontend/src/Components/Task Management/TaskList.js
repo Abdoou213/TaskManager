@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-function TaskList() {
-  debugger
+function TaskList({ userId }) {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
@@ -11,12 +10,19 @@ function TaskList() {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/tasks');
+      const token = localStorage.getItem('token'); // Get the token from local storage
+      const response = await axios.get('http://localhost:5000/api/tasks', {
+        headers: {
+          Authorization: token, // Include the token in the headers
+        },
+      });
       setTasks(response.data);
     } catch (error) {
       console.error('Fetching tasks error:', error);
     }
   };
+
+
 
   return (
     <div className="task-list">

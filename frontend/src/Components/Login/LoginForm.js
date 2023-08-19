@@ -1,15 +1,14 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import './LoginForm.css';
 
-function LoginForm() {
+function LoginForm({ setUserId }) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(null);
-  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,9 +18,12 @@ function LoginForm() {
         password: password,
       });
       console.log('Login successful:', response.data);
+      
+      localStorage.setItem('token', response.data.token); // Store the token in local storage
+      setUserId(response.data.userId); // Set the user ID in App component state
       setLoginError(null);
-      setLoginSuccess(true); 
-      navigate('/tasks'); 
+      
+      navigate('/tasks'); // Redirect to tasks page
     } catch (error) {
       console.error('Login error:', error);
       setLoginError('Login failed. Please check your credentials.');
@@ -46,7 +48,6 @@ function LoginForm() {
         />
         <button type="submit">Login</button>
       </form>
-      {loginSuccess && <p className="success-message">Login successful!</p>}
       {loginError && <p className="error-message">{loginError}</p>}
       
       <p>Don't have an account? <Link to="/register">Register here</Link></p>
